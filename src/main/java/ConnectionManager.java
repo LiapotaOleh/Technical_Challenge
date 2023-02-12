@@ -3,6 +3,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 public class ConnectionManager {
     private String address;
@@ -17,25 +18,26 @@ public class ConnectionManager {
     }
 
     public String produceRequest() {
-        StringBuilder response = new StringBuilder();
+        String response = "";
 
         try {
-            address += ParameterStringBuilder.getParamsString(parameters);
+            address +="?" + ParameterStringBuilder.getParamsString(parameters);
             HttpURLConnection connection = (HttpURLConnection) new URL(address).openConnection();
 
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(connection.getInputStream())));
             String inputLine;
+            StringBuilder content = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                content.append(inputLine);
             }
             in.close();
+            response += content.toString();
 
             connection.disconnect();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return response.toString();
+        return response;
     }
 }
