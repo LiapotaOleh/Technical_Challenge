@@ -18,7 +18,7 @@ public class ConnectionManager {
     }
 
     public String produceRequest() {
-        String response = "";
+        String response;
 
         try {
             address +="?" + ParameterStringBuilder.getParamsString(parameters);
@@ -31,11 +31,11 @@ public class ConnectionManager {
                 content.append(inputLine);
             }
             in.close();
-            response += content.toString();
+            response = content.substring(content.indexOf("["), content.lastIndexOf("]") + 1);
 
             connection.disconnect();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            response = "[]";
         }
 
         return response;
